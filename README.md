@@ -1,2 +1,11 @@
 # flask-experiment
-Playing with Flask, working from this tutorial: https://danidee10.github.io/2016/09/18/flask-by-example-1.html
+Playing with Flask and MQTT using very simple punchcard site
+
+### To launch
+
+```
+docker run --name=punch -e MQTT_URL=URL_TO_MQTT_SERVER -e MQTT_PORT=1883 -p 5000:5000 -it havnfun/punch
+```
+
+### Note
+Currently has no error handling or support for security on MQTT server

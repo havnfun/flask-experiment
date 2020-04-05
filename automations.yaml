@@ -1,0 +1,313 @@
+- id: '1578184816856'
+  alias: Toggle Bedroom Lamp
+  description: ''
+  trigger:
+  - entity_id: binary_sensor.empty_button
+    from: 'off'
+    platform: state
+    to: 'on'
+  condition: []
+  action:
+  - entity_id: switch.bedroom_lamp
+    service: switch.toggle
+- id: '1578190922485'
+  alias: Basement Light Bulb On
+  description: ''
+  trigger:
+  - entity_id: media_player.basement_tv
+    from: 'off'
+    platform: state
+    to: 'on'
+  condition: []
+  action:
+  - entity_id: light.basement_light_bulb
+    service: light.turn_on
+- id: '1578191119350'
+  alias: Basement Motion Lights Off
+  description: ''
+  trigger:
+  - entity_id: binary_sensor.basement_linear_wapirz_1_motion_sensor_sensor
+    for: 0:15:00
+    from: 'on'
+    platform: state
+    to: 'off'
+  condition:
+  - condition: state
+    entity_id: media_player.basement_tv
+    state: 'off'
+  action:
+  - entity_id: group.basement
+    service: homeassistant.turn_off
+- id: '1578191774717'
+  alias: Doorbell
+  description: ''
+  trigger:
+  - entity_id: binary_sensor.doorbell
+    platform: state
+    to: 'on'
+  condition: []
+  action:
+  - data:
+      data:
+        attachment:
+          content-type: jpeg
+        entity_id: camera.porch_cam
+        push:
+          category: camera
+      message: Doorbell
+    service: notify.mobile_app_russell_buchanan_iphone
+  - data_template:
+      node_id: 23
+      parameter: 7
+      size: 1
+      value: Secondary Notification Will Play
+    service: zwave.set_config_parameter
+  - data_template:
+      node_id: 23
+      parameter: 6
+      size: 1
+      value: Doorbell
+    service: zwave.set_config_parameter
+  - data_template:
+      node_id: 23
+      parameter: 4
+      size: 1
+      value: Medium
+    service: zwave.set_config_parameter
+  - entity_id: switch.dome_siren_switch
+    service: homeassistant.turn_on
+  - data_template:
+      node_id: 23
+      parameter: 7
+      size: 1
+      value: Primary Notification Will Play
+    service: zwave.set_config_parameter
+  - data_template:
+      node_id: 23
+      parameter: 4
+      size: 1
+      value: Low
+    service: zwave.set_config_parameter
+  - data_template:
+      node_id: 23
+      parameter: 6
+      size: 1
+      value: Beep
+    service: zwave.set_config_parameter
+- id: '1578192880057'
+  alias: Door Opens
+  description: ''
+  trigger:
+  - entity_id: binary_sensor.front_door
+    platform: state
+    to: 'on'
+  - entity_id: binary_sensor.kitchen_door
+    platform: state
+    to: 'on'
+  - entity_id: binary_sensor.basement_door
+    platform: state
+    to: 'on'
+  - entity_id: binary_sensor.jacks_door
+    platform: state
+    to: 'on'
+  condition: []
+  action:
+  - data_template:
+      node_id: 23
+      parameter: 7
+      size: 1
+      value: Secondary Notification Will Play
+    service: zwave.set_config_parameter
+  - entity_id: switch.dome_siren_switch
+    service: homeassistant.turn_on
+  - data_template:
+      node_id: 23
+      parameter: 7
+      size: 1
+      value: Primary Notification Will Play
+    service: zwave.set_config_parameter
+- id: '1578194375295'
+  alias: Goodnight
+  description: ''
+  trigger:
+  - entity_id: light.front_hallway_leviton_dz6hd_1bz_dimmer_level
+    platform: state
+    to: 'off'
+  condition:
+  - condition: or
+    conditions:
+    - after: '22:30:00'
+      condition: time
+    - before: 04:30:00
+      condition: time
+  action:
+  - entity_id: group.most_lights
+    service: homeassistant.turn_off
+- id: '1578195134044'
+  alias: Kitchen Motion Lights Off
+  description: ''
+  trigger:
+  - entity_id: binary_sensor.kitchen_linear_wapirz_1_motion_sensor_sensor
+    for: 01:00:00
+    platform: state
+    to: 'off'
+  condition:
+  - condition: and
+    conditions:
+    - before: sunset
+      before_offset: 02:00:00
+      condition: sun
+    - before: '21:30:00'
+      condition: time
+  action:
+  - entity_id: group.kitchen
+    service: homeassistant.turn_off
+- id: '1578195393127'
+  alias: Livingroom Motion Lights Off
+  description: ''
+  trigger:
+  - entity_id: binary_sensor.front_hallway_motion
+    for: 01:00:00
+    platform: state
+    to: 'off'
+  condition:
+  - condition: or
+    conditions:
+    - before: sunset
+      before_offset: 02:00:00
+      condition: sun
+    - after: '22:30'
+      condition: time
+  action:
+  - entity_id: group.livingroom
+    service: homeassistant.turn_off
+- id: '1578195908483'
+  alias: Livingroom Lights On
+  description: ''
+  trigger:
+  - entity_id: zwave.leviton_dz6hd_1bz_decora_600w_smart_dimmer_2
+    platform: state
+    to: 'on'
+  condition:
+  - after: 04:30:00
+    before: '22:30:00'
+    condition: time
+  action:
+  - entity_id: group.livingroom
+    service: homeassistant.turn_on
+- id: '1578196278100'
+  alias: Night Porch Light Off
+  description: ''
+  trigger:
+  - at: '23:05:00'
+    platform: time
+  condition: []
+  action:
+  - entity_id: switch.front_porch_leviton_dz15s_1bz_switch
+    service: switch.turn_off
+- id: '1578196969834'
+  alias: Sunset Front Porch Light On
+  description: ''
+  trigger:
+  - below: '15'
+    entity_id: sensor.front_porch_vision_zp3111_multisensor_4in1_luminance
+    for: 00:15:00
+    platform: numeric_state
+  condition:
+  - condition: and
+    conditions:
+    - after: sunset
+      after_offset: -00:15:00
+      condition: sun
+    - before: '23:00:00'
+      condition: time
+  action:
+  - entity_id: switch.front_porch_leviton_dz15s_1bz_switch
+    service: switch.turn_on
+- id: '1578197301439'
+  alias: Sunset Few Lights On
+  description: ''
+  trigger:
+  - below: '70'
+    entity_id: sensor.avg_luminance
+    platform: numeric_state
+  - event: sunset
+    offset: -00:30:00
+    platform: sun
+  condition:
+  - condition: and
+    conditions:
+    - after: sunset
+      after_offset: -01:45:00
+      condition: sun
+    - before: sunset
+      before_offset: -02:00:00
+      condition: sun
+  action:
+  - entity_id: group.few_lights
+    service: homeassistant.turn_on
+- id: '1578267671957'
+  alias: Jack Left School
+  description: ''
+  trigger:
+  - entity_id: device_tracker.jack_s_iphone
+    event: leave
+    platform: zone
+    zone: zone.winchester
+  condition: []
+  action:
+  - data:
+      message: Jack left school.
+    service: notify.mobile_app_russell_buchanan_iphone
+- id: '1578267796855'
+  alias: Jack Arrived Home
+  description: ''
+  trigger:
+  - entity_id: device_tracker.jack_s_iphone
+    event: enter
+    platform: zone
+    zone: zone.home
+  condition: []
+  action:
+  - data:
+      message: Jack arrived home.
+    service: notify.mobile_app_russell_buchanan_iphone
+- id: '1578267925669'
+  alias: Skye Arrived School
+  description: ''
+  trigger:
+  - entity_id: device_tracker.skyes_iphone_2
+    event: enter
+    platform: zone
+    zone: zone.danforth
+  condition: []
+  action:
+  - data:
+      message: Skye arrived at school.
+    service: notify.mobile_app_russell_buchanan_iphone
+- id: '1578267981119'
+  alias: Skye Left School
+  description: ''
+  trigger:
+  - entity_id: device_tracker.skyes_iphone_2
+    event: leave
+    platform: zone
+    zone: zone.danforth
+  condition: []
+  action:
+  - data:
+      message: Skye left school.
+    service: notify.mobile_app_russell_buchanan_iphone
+- id: '1578268034176'
+  alias: Skye Arrived Home
+  description: ''
+  trigger:
+  - entity_id: device_tracker.skyes_iphone_2
+    event: enter
+    platform: zone
+    zone: zone.home
+  condition: []
+  action:
+  - data:
+      message: Skye arrived home.
+    service: notify.mobile_app_russell_buchanan_iphone

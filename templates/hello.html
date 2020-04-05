@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+   <body onload="getLocation()" >
+      <form action = "{{ path }}" method = "POST">
+         <p><h3>Welcome.</h3></p>
+         <p>Who do you want to check {{ direction }}?</p>
+         <p><input id="lat" type = 'text' name = 'lat' hidden="true"/></p>
+         <p><input id="lon" type = 'text' name = 'lon' hidden="true"/></p>
+         <p>User: <input type = 'text' name = 'nm' value = '{{ nm }}'/></p>
+         <p><input type = 'submit' value = 'Check {{ direction }}'/></p>
+      </form>
+   </body>
+
+   <script>
+   var x = document.getElementById("lat");
+   var y = document.getElementById("lon");
+
+   function getLocation() {
+     if (navigator.geolocation) {
+       navigator.geolocation.getCurrentPosition(showPosition);
+     } else {
+       x.value = 'na';
+       y.value = 'na';
+     }
+   }
+
+   function showPosition(position) {
+     x.value = position.coords.latitude;
+     y.value = position.coords.longitude;
+   }
+   </script>
+
+</html>
