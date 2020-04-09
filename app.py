@@ -1,19 +1,20 @@
 # Importing flask module in the project is mandatory
 # An object of Flask class is our WSGI application.
 from flask import Flask, render_template, request, redirect, url_for, flash, make_response, jsonify
-import paho.mqtt.client as mqtt
+from flask_mqtt import Mqtt
 import time
 import os
 
 # Flask
 app = Flask(__name__)
-
 # MQTT
-broker_url = str(os.getenv('MQTT_URL'))
-broker_port = int(os.getenv('MQTT_PORT'))
-client = mqtt.Client(client_id="punch", clean_session=False)
-print(broker_url, broker_port)
-client.connect(broker_url, broker_port)
+app.config['MQTT_BROKER_URL'] = str(os.getenv('MQTT_URL'))
+app.config['MQTT_BROKER_PORT'] = int(os.getenv('MQTT_PORT'))
+#app.config['MQTT_USERNAME'] = int(os.getenv('MQTT_USR'))
+#app.config['MQTT_PASSWORD'] = int(os.getenv('MQTT_PWD'))
+app.config['MQTT_REFRESH_TIME'] = 5.0  # refresh time in seconds
+
+mqtt = Mqtt(app)
 
 # The route() function of the Flask class is a decorator,
 # which tells the application which URL should call
@@ -40,8 +41,9 @@ def punch(org, dept, punch):
 
             localtime = time.asctime( time.localtime(time.time()) )
             message = '{"Name"="%s", "Org"="%s", "Dept"="%s", "Punch"="%s", Time"="%s", Lat"=%s, "Lon"=%s}' % (user, org, dept, punch, localtime, lat, lon)
+            print(topic)
             print(message)
-            client.publish(topic=topic, payload=message, qos=1, retain=True)
+            mqtt.publish(topic=topic, payload=message, qos=1, retain=False)
 
     else:
         if not request.cookies.get('userName'):
@@ -59,4 +61,4 @@ if __name__ == '__main__':
 
     # run() method of Flask class runs the application
     # on the local development server.
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', use_reloader=False)
