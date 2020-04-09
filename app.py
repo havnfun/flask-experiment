@@ -11,7 +11,7 @@ app = Flask(__name__)
 # MQTT
 broker_url = str(os.getenv('MQTT_URL'))
 broker_port = int(os.getenv('MQTT_PORT'))
-client = mqtt.Client()
+client = mqtt.Client(client_id="punch", clean_session=False)
 print(broker_url, broker_port)
 client.connect(broker_url, broker_port)
 
@@ -41,7 +41,7 @@ def punch(org, dept, punch):
             localtime = time.asctime( time.localtime(time.time()) )
             message = '{"Name"="%s", "Org"="%s", "Dept"="%s", "Punch"="%s", Time"="%s", Lat"=%s, "Lon"=%s}' % (user, org, dept, punch, localtime, lat, lon)
             print(message)
-            client.publish(topic=topic, payload=message, qos=1, retain=False)
+            client.publish(topic=topic, payload=message, qos=1, retain=True)
 
     else:
         if not request.cookies.get('userName'):
